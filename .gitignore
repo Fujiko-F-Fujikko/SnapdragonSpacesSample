@@ -1,0 +1,79 @@
+# --- Unity must-track (絶対に追跡すべき) ---
+# ※ 他の .gitignore / グローバル設定で誤って無視されても打ち消す
+!**/*.meta
+!ProjectSettings/**
+!Packages/**
+
+# --- Unity generated / キャッシュ系 ---
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+[Bb]urstCache/
+# 個人設定は通常コミットしない
+[Uu]ser[Ss]ettings/
+# Unity temporary user session data
+.utmp/
+
+# --- ビルド成果物・一時 ---
+*.apk
+*.aab
+*.app
+*.xcworkspace/
+*.xcuserstate
+*.xcuserdatad
+*.ipa
+/Bin*/
+
+
+# --- Visual Studio / Rider / VSCode ---
+# 自動生成プロジェクトファイル（必要になったら再生成でOK）
+*.csproj
+*.sln
+*.suo
+*.user
+*.unityproj
+*.pidb
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+.vs/
+.idea/
+.vscode/
+
+# --- そのほか一時ファイル ---
+*.tmp
+*.log
+*.orig
+*.diff
+*.patch
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- プラットフォーム別（必要に応じて） ---
+# Android / Gradle
+.gradle/
+*.gradle
+LocalProperties.xml
+.gradle/
+**/gradle-wrapper.jar
+
+# Xcode (iOS)
+DerivedData/
+*.xcworkspace/
+*.xcodeproj/project.xcworkspace/
+*.xcodeproj/xcuserdata/
+
+# Snapdragon Spacesのサンプルフォルダ
+Assets/Samples/Snapdragon Spaces/
+Assets/Samples/Snapdragon Spaces.meta
+
+# 自動生成される
+/ProjectSettings/Packages/com.unity.testtools.codecoverage
