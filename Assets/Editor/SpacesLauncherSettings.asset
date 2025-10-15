@@ -16,9 +16,9 @@ MonoBehaviour:
   requireHandTracking: 0
   useEyeTracking: 0
   requireEyeTracking: 0
-  usePassthrough: 0
-  requirePassthrough: 0
-  useControllers: 0
-  requireControllers: 0
+  usePassthrough: 1
+  requirePassthrough: 1
+  useControllers: 1
+  requireControllers: 1
   useRoomScale: 0
   requireRoomScale: 0
