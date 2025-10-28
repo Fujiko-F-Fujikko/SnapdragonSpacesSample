@@ -3477,11 +3477,11 @@ GameObject:
   m_Component:
   - component: {fileID: 2828834975661276292}
   - component: {fileID: 8135196717053430797}
+  - component: {fileID: 5717311883471039717}
   - component: {fileID: 6272982347353503357}
   - component: {fileID: 5986740004207630153}
   - component: {fileID: 3936954100740384914}
   - component: {fileID: 3866404717235876793}
-  - component: {fileID: 5717311883471039717}
   m_Layer: 0
   m_Name: kitchen_prefab_net
   m_TagString: Untagged
@@ -3556,6 +3556,19 @@ MonoBehaviour:
   m_usdVariabilityCache: 1
   LastHandedness: 1
   LastScale: 1
+--- !u!114 &5717311883471039717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5512996091356712857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5c0a2371b63dc44199935c88ef12809, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_usdPrimPath: /root
 --- !u!114 &6272982347353503357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3568,7 +3581,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2980329125
+  GlobalObjectIdHash: 2938341136
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -3636,19 +3649,6 @@ MonoBehaviour:
   pollInterval: 0.5
   debounceSeconds: 1
   verboseLog: 0
---- !u!114 &5717311883471039717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5512996091356712857}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5c0a2371b63dc44199935c88ef12809, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_usdPrimPath: /root
 --- !u!1 &6026454769566613794
 GameObject:
   m_ObjectHideFlags: 0

@@ -803,7 +803,7 @@ GameObject:
   - component: {fileID: 1192540803}
   - component: {fileID: 1192540805}
   m_Layer: 0
-  m_Name: KitchenSetSpawner
+  m_Name: USDPrefabSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -856,7 +856,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c20562322e992e408aa445c204bcabe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  kitchenPrefab: {fileID: 6272982347353503357, guid: 21641985b1d2b1846b0fe6151ed37fe6, type: 3}
+  usdPrefab: {fileID: 6272982347353503357, guid: 21641985b1d2b1846b0fe6151ed37fe6, type: 3}
   spawnPosition: {x: -15, y: -8, z: 4}
   spawnRotation: {x: 90, y: 0, z: 0}
   spawnScale: {x: 10, y: 10, z: 10}
@@ -2571,7 +2571,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1b87ccecb52e12418785a62f514e58d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverIp: 192.168.68.71
+  serverIp: 192.168.82.14
   port: 7777
   autoReconnect: 1
   retryIntervalSeconds: 3
