@@ -1,3 +1,5 @@
+// Android専用
+#if UNITY_ANDROID
 using System.Collections;
 using Qualcomm.Snapdragon.Spaces;
 using UnityEngine;
@@ -68,3 +70,8 @@ public class EnablePassthroughRobust : MonoBehaviour
     Debug.LogWarning("[PT] Timed out waiting for passthrough readiness.");
   }
 }
+#else
+// Android 以外では空実装（コンパイルは通す）
+using UnityEngine;
+public class EnablePassthroughRobust : MonoBehaviour { }
+#endif
