@@ -77,3 +77,11 @@ Assets/Samples/Snapdragon Spaces.meta
 
 # 自動生成される
 /ProjectSettings/Packages/com.unity.testtools.codecoverage
+
+# ビルド成果物
+Assets/AddressableAssetsData/
+Assets/AddressableAssetsData.meta
+ServerData/
+
+# 大きいUSDファイル
+USDAssets/Full_Scene/

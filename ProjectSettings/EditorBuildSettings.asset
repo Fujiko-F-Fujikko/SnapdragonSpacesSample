@@ -16,13 +16,20 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ClientScene.unity
     guid: d28b63b0e21416943aad49eeae3e5394
   - enabled: 0
     path: Assets/Scenes/ServerScene.unity
     guid: 26417edc2e26e624ea2f269d402d55cf
+  - enabled: 0
+    path: Assets/Scenes/ClientScene_AddressablesTest.unity
+    guid: 225aff43507bc7441adba88dba25dd2f
+  - enabled: 1
+    path: Assets/Scenes/ServerScene_AddressablesTest.unity
+    guid: 59efb95bdffea4045a4097ccc068592e
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 719cdac84a513e0408a2fd2f261357b8, type: 2}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 972fba93a048d5a498ddf55a66afd2c2, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: a76e12822618cf3488aafb98d803a561, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 282e6d0aac8d8324a891e3d7527bd8ec, type: 2}

@@ -10,13 +10,16 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class UsdAutoReloaderBehaviour : MonoBehaviour
 {
+
+  public static event System.Action OnUsdReloaded;
+
   [Header("Refs")]
   [Tooltip("同じGameObjectに付いている UsdAsset。未指定なら自動取得します")]
   [SerializeField] private UsdAsset usdAsset;
 
-  [Header("Options")]
-  [Tooltip("NGO使用時、Server/Host のときだけ動かす")]
-  [SerializeField] private bool onlyIfServer = true;
+  //  [Header("Options")]
+  //  [Tooltip("NGO使用時、Server/Host のときだけ動かす")]
+  //  [SerializeField] private bool onlyIfServer = true;
 
   [Tooltip("更新チェック間隔（秒）")]
   [SerializeField] private float pollInterval = 0.5f;
@@ -39,10 +42,11 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
       enabled = false; return;
     }
 
-    if (onlyIfServer && (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer))
-    {   // クライアント側では無効化
-      enabled = false; return;
-    }
+    //    if (onlyIfServer && (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer))
+    //    {   // クライアント側では無効化
+    //      Debug.Log("[USD] NGO Server でないため無効化。", this);
+    //      enabled = false; return;
+    //    }
 
     _path = usdAsset.usdFullPath;
     if (string.IsNullOrEmpty(_path) || !File.Exists(_path))
@@ -91,8 +95,10 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
     if (!usdAsset) return;
     try
     {
-      usdAsset.Reload(false);   // ★ “その場更新” (NetworkObjectを壊さない)
-      if (verboseLog) Debug.Log("[USD] Reload(false) executed.", this);
+      usdAsset.Reload(true);   // ★ “その場更新” (NetworkObjectを壊さない)
+      if (verboseLog) Debug.Log("[USD] Reload(true) executed.", this);
+
+      OnUsdReloaded?.Invoke();
     }
     catch (Exception ex)
     {
@@ -105,6 +111,9 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
 using UnityEngine;
 public class UsdAutoReloaderBehaviour : MonoBehaviour
 {
+
+  public static event System.Action OnUsdReloaded;
+
   [SerializeField] private bool logOnce = true;
   void Awake() { if (logOnce) Debug.Log("[USD] UsdAutoReloaderBehaviour disabled (HAS_UNITY_USD not defined).", this); }
 }

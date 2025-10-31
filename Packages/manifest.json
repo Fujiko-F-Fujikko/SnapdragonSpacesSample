@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.qualcomm.snapdragon.spaces": "file:C:/Users/0000144170/Downloads/VRMR_Snapdragon_Spaces_SDK_1_0_3_for_Unity/Unity Package/com.qualcomm.snapdragon.spaces-1.0.3.tgz",
+    "com.unity.addressables": "1.21.21",
     "com.unity.collab-proxy": "2.2.0",
     "com.unity.feature.development": "1.0.1",
     "com.unity.formats.usd": "3.0.0-exp.5",
