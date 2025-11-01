@@ -154,32 +154,58 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
     foreach (var tr in root.GetComponentsInChildren<Transform>(true))
     {
       if (tr == this.transform) continue;
-      if (!tr.GetComponent<MeshRenderer>()) continue; // 見た目があるものだけ
+      if (!tr.GetComponent<MeshRenderer>()) continue;
 
       var go = Instantiate(dummyNetworkObjectPrefab);
       var no = go.GetComponent<NetworkObject>();
       var view = go.GetComponent<UsdDummyView>();
 
-      no.Spawn(); // ← 先にスポーンさせる！
+      no.Spawn();
 
-      // USD側からこのTransformの色を拾う（例: primvars:displayColor が (0,0,1)なら…）
-      Color col = ExtractColorFromUsdNode(tr); // ← ここはあなたの環境に合わせて
+      tr.gameObject.SetActive(false); // USDファイルから読み込んだそのものは見せない
 
+      Color col = ExtractColorFromUsdNode(tr);
+
+      // USD側のパスは今まで通り
       string usdPath = tr.GetComponent<UsdPrimSource>().m_usdPrimPath;
-      Debug.Log("tr.name: " + tr.name + ", tr.tag: " + tr.tag);
-      Debug.Log("UsdPrimSource.m_usdPrimPath: " + usdPath);
-      Debug.Log($"[USD] Spawning dummy for '{usdPath}' at {tr.position}, scale={tr.lossyScale}, color={col}");
+
+      // ★ ここで種類を決める
+      byte kind = GuessVisualKind(usdPath, tr);
+
       view.ServerInit(
           usdPath,
           tr.position,
           tr.rotation,
           tr.lossyScale,
-          col
+          col,
+          kind
       );
 
       // ★ Spawnしたら覚えておく
       _spawnedDummies.Add(no);
     }
+  }
+
+  byte GuessVisualKind(string usdPath, Transform tr)
+  {
+    // 例1: パスで判定
+    if (usdPath.Contains("Cube"))
+      return 0; // Cube
+    if (usdPath.Contains("Sphere"))
+      return 1; // Sphere
+    if (usdPath.Contains("Cylinder"))
+      return 2; // Cylinder
+
+    // 例2: USD側で "SM_" を付けておいて、それをカスタムMeshにする
+    if (usdPath.Contains("Spoon"))
+      return 10;   // customMesh0
+    if (usdPath.Contains("Crayon"))
+      return 11;   // customMesh1
+    if (usdPath.Contains("Chair"))
+      return 12;   // customMesh2
+
+    // 何も当たらなければCube
+    return 0;
   }
 
   Color ExtractColorFromUsdNode(Transform tr)

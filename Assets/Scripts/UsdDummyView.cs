@@ -1,4 +1,3 @@
-// UsdDummyView.cs
 using System;
 using Unity.Collections;
 using Unity.Netcode;
@@ -13,45 +12,58 @@ public class UsdDummyView : NetworkBehaviour
   public NetworkVariable<Color> displayColor =
       new(writePerm: NetworkVariableWritePermission.Server);
 
+  // ★ 追加: どの見た目を出すか（サーバーが決める）
+  // 0 = Cube, 1 = Sphere, 2 = Cylinder, 10〜 = カスタムMesh
+  public NetworkVariable<byte> visualKind =
+      new(writePerm: NetworkVariableWritePermission.Server);
+
+  // ★ 追加: クライアントが持ってる固定メッシュたち
+  // インスペクタで入れておく
+  [SerializeField] private Mesh[] meshTable;
+
+
   MeshRenderer _renderer;
 
   public override void OnNetworkSpawn()
   {
-    // 1) 位置だけはすぐ反映してOK
+    // Transform
     ApplyTransform(worldPos.Value, worldRot.Value, worldScale.Value);
 
-    // 2) 一旦見た目を用意しておく
-    _renderer = EnsureVisual(usdPath.Value.ToString());
+    // 見た目を今ある値で作る
+    _renderer = EnsureVisual(visualKind.Value, usdPath.Value.ToString());
 
-    // 3) いま持ってる色を一旦塗る（多分まだ黒）
+    // 色を一旦適用
     ApplyColor(displayColor.Value);
 
-    // 4) → 本物の色がサーバーから届いたら塗りなおす
+    // コールバック
     displayColor.OnValueChanged += OnColorChanged;
-
-    // 5) → 本物のPathがサーバーから届いたら見た目を更新する
     usdPath.OnValueChanged += OnUsdPathChanged;
+    visualKind.OnValueChanged += OnVisualKindChanged;
   }
 
   public override void OnNetworkDespawn()
   {
-    // 念のため解除
     displayColor.OnValueChanged -= OnColorChanged;
     usdPath.OnValueChanged -= OnUsdPathChanged;
+    visualKind.OnValueChanged -= OnVisualKindChanged;
   }
 
   void OnColorChanged(Color prev, Color now)
   {
-    Debug.Log($"[USD Dummy] Color changed from {prev} to {now}");
     ApplyColor(now);
   }
 
-  private void OnUsdPathChanged(FixedString128Bytes prev, FixedString128Bytes now)
+  void OnUsdPathChanged(FixedString128Bytes prev, FixedString128Bytes now)
   {
-    Debug.Log($"[USD Dummy] USD Path changed from {prev} to {now}");
-    _renderer = EnsureVisual(now.ToString());
+    // 名前だけ変えるならこれでOK
+    gameObject.name = now.ToString();
+  }
 
-    //ApplyColor(displayColor.Value);
+  void OnVisualKindChanged(byte prev, byte now)
+  {
+    // 見た目を作り直す
+    _renderer = EnsureVisual(now, usdPath.Value.ToString());
+    ApplyColor(displayColor.Value);
   }
 
   void ApplyTransform(Vector3 pos, Quaternion rot, Vector3 scale)
@@ -61,43 +73,80 @@ public class UsdDummyView : NetworkBehaviour
     transform.localScale = scale;
   }
 
-  MeshRenderer EnsureVisual(string path)
+  // ★ここで「種類に応じて」見た目を作る
+  MeshRenderer EnsureVisual(byte kind, string path)
   {
+    // すでにあったら消す
     if (_renderer != null)
     {
-      // すでにある場合は一度削除する
       Destroy(_renderer.gameObject);
+      _renderer = null;
     }
 
-    Debug.Log($"[USD Dummy] EnsureVisual for path: {path}");
-    var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+    GameObject go = null;
+
+    if (kind >= 10)
+    {
+      go = CreateFromMesh(meshTable[kind - 10]);
+    }
+    else
+    {
+      switch (kind)
+      {
+        case 0: // Cube
+          go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+          break;
+        case 1: // Sphere
+          go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+          break;
+        case 2: // Cylinder
+          go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+          break;
+        default:
+          // 不明ならCubeにしちゃう
+          go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+          break;
+      }
+    }
+
     go.transform.SetParent(transform, false);
+    go.name = "Visual_" + kind.ToString();
     gameObject.name = path;
 
-    // Colliderは不要なので消す
+    // Colliderはいらなければ消す
     var col = go.GetComponent<Collider>();
     if (col != null) Destroy(col);
 
     return go.GetComponent<MeshRenderer>();
   }
 
+  GameObject CreateFromMesh(Mesh mesh)
+  {
+    var go = new GameObject("MeshVisual");
+    var mf = go.AddComponent<MeshFilter>();
+    var mr = go.AddComponent<MeshRenderer>();
+    mf.sharedMesh = mesh;
+    return go;
+  }
+
   void ApplyColor(Color c)
   {
     if (_renderer == null) return;
 
-    // 共有マテリアルを汚さない
-    if (!(_renderer.material is null))
-    {
-      // URPだと _BaseColor を持ってることが多いので両方書いておく
-      var mat = _renderer.material;
-      mat.color = c;
-      if (mat.HasProperty("_BaseColor"))
-        mat.SetColor("_BaseColor", c);
-    }
+    var mat = _renderer.material;
+    mat.color = c;
+    if (mat.HasProperty("_BaseColor"))
+      mat.SetColor("_BaseColor", c);
   }
 
   // サーバーからSpawn後に呼ぶ
-  public void ServerInit(string path, Vector3 pos, Quaternion rot, Vector3 scale, Color col)
+  public void ServerInit(
+      string path,
+      Vector3 pos,
+      Quaternion rot,
+      Vector3 scale,
+      Color col,
+      byte kind)
   {
     if (!IsServer) return;
 
@@ -105,11 +154,12 @@ public class UsdDummyView : NetworkBehaviour
     worldPos.Value = pos;
     worldRot.Value = rot;
     worldScale.Value = scale;
-    displayColor.Value = col;  // ← これが届いた瞬間にクライアントで色が塗りなおる
+    displayColor.Value = col;
+    visualKind.Value = kind;   // ★ここ
 
-    // サーバー自身も反映
+    // サーバーでも反映
     ApplyTransform(pos, rot, scale);
-    _renderer = EnsureVisual(path);
+    _renderer = EnsureVisual(kind, path);
     ApplyColor(col);
   }
 }

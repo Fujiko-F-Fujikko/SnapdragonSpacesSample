@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3025796015
+  GlobalObjectIdHash: 1362045767
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -241,3 +241,9 @@ MonoBehaviour:
     m_InternalValue: {x: 0, y: 0, z: 0}
   displayColor:
     m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
+  visualKind:
+    m_InternalValue: 0
+  meshTable:
+  - {fileID: 7891779296415825867, guid: 0029463e0677aa8459ad9fe2633e0299, type: 3}
+  - {fileID: -2123866163247891807, guid: 34f2f7bc9b86ceb4fb73ca622d450abe, type: 3}
+  - {fileID: -6264831526926562434, guid: 6193df34910eb644ba8ee82c12a85a74, type: 3}

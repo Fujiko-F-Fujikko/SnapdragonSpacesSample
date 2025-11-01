@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5929898784657802256}
   - component: {fileID: 7534288900440909095}
+  - component: {fileID: 89684973728193797}
   - component: {fileID: 4900695096538100034}
   - component: {fileID: 8436157599195625077}
-  - component: {fileID: 911239224997795919}
-  - component: {fileID: 89684973728193797}
+  - component: {fileID: -6819001618422719782}
   m_Layer: 0
   m_Name: SampleCube_prefab_net
   m_TagString: Untagged
@@ -87,6 +87,19 @@ MonoBehaviour:
   m_usdVariabilityCache: 1
   LastHandedness: 1
   LastScale: 1
+--- !u!114 &89684973728193797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1361753381785569055}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5c0a2371b63dc44199935c88ef12809, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_usdPrimPath: /World
 --- !u!114 &4900695096538100034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99,7 +112,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3916401391
+  GlobalObjectIdHash: 1178721995
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -137,7 +150,7 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &911239224997795919
+--- !u!114 &-6819001618422719782
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -149,28 +162,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84e1895f66789db41a021c56dcf039d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usdAsset: {fileID: 0}
+  usdAsset: {fileID: 7534288900440909095}
   onlyIfServer: 1
   pollInterval: 0.5
   debounceSeconds: 1
-  verboseLog: 1
+  verboseLog: 0
   autoNetworkize: 1
   skipExistingNetworkObjects: 1
   dummyNetworkObjectPrefab: {fileID: 3485070251599251333, guid: 9e0b0e030f9dd2242acee6f5771aaeb8, type: 3}
   networkizeRoot: {fileID: 0}
---- !u!114 &89684973728193797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1361753381785569055}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5c0a2371b63dc44199935c88ef12809, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_usdPrimPath: /World
 --- !u!43 &-4193172680144334667
 Mesh:
   m_ObjectHideFlags: 0
