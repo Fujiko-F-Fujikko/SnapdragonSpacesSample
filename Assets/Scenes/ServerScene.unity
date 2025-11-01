@@ -516,10 +516,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c20562322e992e408aa445c204bcabe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usdPrefab: {fileID: 6272982347353503357, guid: 21641985b1d2b1846b0fe6151ed37fe6, type: 3}
-  spawnPosition: {x: -15, y: -8, z: 4}
-  spawnRotation: {x: 90, y: 0, z: 0}
-  spawnScale: {x: 10, y: 10, z: 10}
+  usdPrefab: {fileID: 4900695096538100034, guid: 54350134be84b84448dd71f10f6e5a23, type: 3}
+  spawnPosition: {x: 0, y: 0, z: 3}
+  spawnRotation: {x: 0, y: 0, z: 0}
+  spawnScale: {x: 1, y: 1, z: 1}
 --- !u!1 &1943507638
 GameObject:
   m_ObjectHideFlags: 0

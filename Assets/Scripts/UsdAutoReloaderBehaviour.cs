@@ -1,10 +1,12 @@
 // --- USDパッケージがあるビルド（Editor/Serverなど）向け本体 ---
 #if HAS_UNITY_USD
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Unity.Formats.USD;
 using Unity.Netcode;
 using UnityEngine;
+
 
 
 [DisallowMultipleComponent]
@@ -26,11 +28,28 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
 
   [SerializeField] private bool verboseLog = false;
 
+  // ▼ 追加: リロード後に子GameObjectを自動でネットワーク化するか
+  [Header("Networkize")]
+  [Tooltip("リロードしたUSDが生成するGameObjectに NetworkObject を自動付与して Spawn する")]
+  [SerializeField] private bool autoNetworkize = true;
+
+  [Tooltip("すでに NetworkObject が付いているものは再Spawnしない")]
+  [SerializeField] private bool skipExistingNetworkObjects = true;
+
+  // ▼ 追加: ダミーのNetwork Object
+  [SerializeField] private GameObject dummyNetworkObjectPrefab;
+
+  // ▼ 追加: どのTransform以下を対象にするか（未指定ならこのGameObject以下）
+  [SerializeField] private Transform networkizeRoot;
+
+  private readonly List<NetworkObject> _spawnedDummies = new();
+
+
   string _path;
   DateTime _lastWriteUtc;
   float _nextPollAt, _scheduledAt = -1f;
 
-  void Awake()
+  void Start()
   {
     if (!usdAsset) usdAsset = GetComponent<UsdAsset>();
     if (!usdAsset)
@@ -39,8 +58,14 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
       enabled = false; return;
     }
 
-    if (onlyIfServer && (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer))
-    {   // クライアント側では無効化
+    if (NetworkManager.Singleton == null)
+    {
+      Debug.Log("[USD] UsdAutoReloaderBehaviour disabled (no NetworkManager).", this);
+      enabled = false; return;
+    }
+    if (onlyIfServer && !NetworkManager.Singleton.IsServer)
+    {
+      Debug.Log("[USD] UsdAutoReloaderBehaviour disabled (not server).", this);
       enabled = false; return;
     }
 
@@ -54,6 +79,8 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
     _lastWriteUtc = File.GetLastWriteTimeUtc(_path);
     _nextPollAt = Time.unscaledTime + pollInterval;
     if (verboseLog) Debug.Log($"[USD] Watching: {_path}", this);
+
+    if (!networkizeRoot) networkizeRoot = this.transform;
   }
 
   void Update()
@@ -88,24 +115,106 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
 
   void TryReload()
   {
+    // ★前回のダミーを片付ける
+    if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+    {
+      DespawnAllDummies();
+    }
+
     if (!usdAsset) return;
     try
     {
-      usdAsset.Reload(false);   // ★ “その場更新” (NetworkObjectを壊さない)
-      if (verboseLog) Debug.Log("[USD] Reload(false) executed.", this);
+      // USDをその場で更新
+      usdAsset.Reload(true);   // ★ “その場更新” (NetworkObjectを壊さない)
+      if (verboseLog) Debug.Log("[USD] Reload(true) executed.", this);
+
+      // ▼ 追加: 更新後にネットワーク化してSpawnする
+      if (autoNetworkize)
+      {
+        NetworkizeSpawnCreatedObjects();
+      }
     }
     catch (Exception ex)
     {
       Debug.LogException(ex, this);
     }
   }
+
+  /// <summary>
+  /// USDの再ロードで生成/更新されたGameObjectに NetworkObject を付けて Spawn する
+  /// </summary>
+  // UsdAutoReloaderBehaviour 側
+  void NetworkizeSpawnCreatedObjects()
+  {
+    if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer)
+      return;
+
+    var root = networkizeRoot ? networkizeRoot : this.transform;
+
+    foreach (var tr in root.GetComponentsInChildren<Transform>(true))
+    {
+      if (tr == this.transform) continue;
+      if (!tr.GetComponent<MeshRenderer>()) continue; // 見た目があるものだけ
+
+      var go = Instantiate(dummyNetworkObjectPrefab);
+      var no = go.GetComponent<NetworkObject>();
+      var view = go.GetComponent<UsdDummyView>();
+
+      no.Spawn(); // ← 先にスポーンさせる！
+
+      // USD側からこのTransformの色を拾う（例: primvars:displayColor が (0,0,1)なら…）
+      Color col = ExtractColorFromUsdNode(tr); // ← ここはあなたの環境に合わせて
+
+      string usdPath = tr.GetComponent<UsdPrimSource>().m_usdPrimPath;
+      Debug.Log("tr.name: " + tr.name + ", tr.tag: " + tr.tag);
+      Debug.Log("UsdPrimSource.m_usdPrimPath: " + usdPath);
+      Debug.Log($"[USD] Spawning dummy for '{usdPath}' at {tr.position}, scale={tr.lossyScale}, color={col}");
+      view.ServerInit(
+          usdPath,
+          tr.position,
+          tr.rotation,
+          tr.lossyScale,
+          col
+      );
+
+      // ★ Spawnしたら覚えておく
+      _spawnedDummies.Add(no);
+    }
+  }
+
+  Color ExtractColorFromUsdNode(Transform tr)
+  {
+    var mr = tr.GetComponentInChildren<MeshRenderer>();
+    if (mr && mr.sharedMaterial && mr.sharedMaterial.HasProperty("_Color"))
+    {
+      return mr.sharedMaterial.color;
+    }
+    return Color.white;
+  }
+
+  void DespawnAllDummies()
+  {
+    // サーバーだけがDespawnする
+    if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer)
+      return;
+
+    foreach (var no in _spawnedDummies)
+    {
+      if (no == null) continue;
+      // true を渡すとクライアント側でもGameObjectごと消える
+      no.Despawn(true);
+    }
+
+    _spawnedDummies.Clear();
+  }
+
 }
 #else
 // --- USDパッケージが無いビルド（クライアント等）でもコンパイルが通るダミー ---
 using UnityEngine;
 public class UsdAutoReloaderBehaviour : MonoBehaviour
 {
-  [SerializeField] private bool logOnce = true;
-  void Awake() { if (logOnce) Debug.Log("[USD] UsdAutoReloaderBehaviour disabled (HAS_UNITY_USD not defined).", this); }
+    [SerializeField] private bool logOnce = true;
+    void Awake() { if (logOnce) Debug.Log("[USD] UsdAutoReloaderBehaviour disabled (HAS_UNITY_USD not defined).", this); }
 }
 #endif

@@ -3649,6 +3649,10 @@ MonoBehaviour:
   pollInterval: 0.5
   debounceSeconds: 1
   verboseLog: 0
+  autoNetworkize: 1
+  skipExistingNetworkObjects: 1
+  dummyNetworkObjectPrefab: {fileID: 0}
+  networkizeRoot: {fileID: 0}
 --- !u!1 &6026454769566613794
 GameObject:
   m_ObjectHideFlags: 0
