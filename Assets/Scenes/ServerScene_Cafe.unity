@@ -517,7 +517,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c20562322e992e408aa445c204bcabe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usdPrefab: {fileID: 903854240926328955, guid: ecf05e7764b812a479992725246113ba, type: 3}
+  networkObject: {fileID: 903854240926328955, guid: ecf05e7764b812a479992725246113ba, type: 3}
   spawnPosition: {x: 0, y: 0, z: 0}
   spawnRotation: {x: 0, y: 0, z: 0}
   spawnScale: {x: 1, y: 1, z: 1}
@@ -533,7 +533,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c20562322e992e408aa445c204bcabe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usdPrefab: {fileID: 7457702091256671490, guid: ad38e6f57e427e347af66a71ea1d51a0, type: 3}
+  networkObject: {fileID: 7457702091256671490, guid: ad38e6f57e427e347af66a71ea1d51a0, type: 3}
   spawnPosition: {x: 0, y: 0, z: 0}
   spawnRotation: {x: 0, y: 0, z: 0}
   spawnScale: {x: 1, y: 1, z: 1}
