@@ -113,7 +113,7 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
     }
   }
 
-  void TryReload()
+  public void TryReload()
   {
     // ★前回のダミーを片付ける
     if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
@@ -154,7 +154,7 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
     foreach (var tr in root.GetComponentsInChildren<Transform>(true))
     {
       if (tr == this.transform) continue;
-      if (!tr.GetComponent<MeshRenderer>()) continue;
+      if (!tr.GetComponent<MeshRenderer>() && !tr.GetComponent<Camera>()) continue;
 
       var go = Instantiate(dummyNetworkObjectPrefab);
       var no = go.GetComponent<NetworkObject>();
@@ -168,6 +168,8 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
 
       // USD側のパスは今まで通り
       string usdPath = tr.GetComponent<UsdPrimSource>().m_usdPrimPath;
+
+      Debug.Log("tr name:" + tr.gameObject.name + " usdPath:" + usdPath);
 
       // ★ ここで種類を決める
       byte kind = GuessVisualKind(usdPath, tr);
@@ -196,6 +198,9 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
     if (usdPath.Contains("Cylinder"))
       return 2; // Cylinder
 
+    if (usdPath.Contains("Camera"))
+      return 3; // Camera
+
     // 例2: USD側で "SM_" を付けておいて、それをカスタムMeshにする
     if (usdPath.Contains("Spoon"))
       return 10;   // customMesh0
@@ -203,6 +208,22 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
       return 11;   // customMesh1
     if (usdPath.Contains("Chair"))
       return 12;   // customMesh2
+    if (usdPath.Contains("CafeTableParasol"))
+      return 13;   // customMesh3
+    if (usdPath.Contains("CafeTableSet"))
+      return 14;   // customMesh4
+    if (usdPath.Contains("Coffee"))
+      return 15;   // customMesh5
+    if (usdPath.Contains("Laptop"))
+      return 16;   // customMesh6
+    if (usdPath.Contains("Plant_01"))
+      return 17;   // customMesh7
+    if (usdPath.Contains("Plant_02"))
+      return 18;   // customMesh8
+    if (usdPath.Contains("Plant_03"))
+      return 19;   // customMesh9
+    if (usdPath.Contains("UFO"))
+      return 20;   // customMesh10
 
     // 何も当たらなければCube
     return 0;

@@ -5,7 +5,7 @@ public class USDPrefabSpawner : NetworkBehaviour
 {
   [SerializeField] private NetworkObject usdPrefab; // USDプレハブを割り当て
   [SerializeField] private Vector3 spawnPosition = new Vector3(0f, 0f, 0f);
-  [SerializeField] private Vector3 spawnRotation = new Vector3(90f, 0f, 0f);
+  [SerializeField] private Vector3 spawnRotation = new Vector3(0f, 0f, 0f);
   [SerializeField] private Vector3 spawnScale = new Vector3(1.0f, 1.0f, 1.0f);
 
   public override void OnNetworkSpawn()
@@ -14,5 +14,12 @@ public class USDPrefabSpawner : NetworkBehaviour
     var obj = Instantiate(usdPrefab, spawnPosition, Quaternion.Euler(spawnRotation));
     obj.transform.localScale = spawnScale;
     obj.Spawn(true); // 全クライアントへ出現
+
+    // 一発リロードする
+    var reloader = obj.GetComponent<UsdAutoReloaderBehaviour>();
+    if (reloader != null)
+    {
+      reloader.TryReload();
+    }
   }
 }

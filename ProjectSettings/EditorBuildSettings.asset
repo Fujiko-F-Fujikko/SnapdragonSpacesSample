@@ -19,9 +19,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/ClientScene.unity
     guid: d28b63b0e21416943aad49eeae3e5394
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ServerScene.unity
     guid: 26417edc2e26e624ea2f269d402d55cf
+  - enabled: 1
+    path: Assets/Scenes/ServerScene_Cafe.unity
+    guid: 4b1475a0eee09d84cbb180b85da8af20
   m_configObjects:
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 972fba93a048d5a498ddf55a66afd2c2, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: a76e12822618cf3488aafb98d803a561, type: 2}

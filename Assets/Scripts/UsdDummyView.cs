@@ -102,6 +102,12 @@ public class UsdDummyView : NetworkBehaviour
         case 2: // Cylinder
           go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
           break;
+        case 3: // Camera
+          // Cameraオブジェクトを作成
+          go = new GameObject("Camera");
+          go.AddComponent<Camera>();
+          go.AddComponent<MeshRenderer>(); // ダミーのMeshRendererを追加
+          break;
         default:
           // 不明ならCubeにしちゃう
           go = GameObject.CreatePrimitive(PrimitiveType.Cube);
