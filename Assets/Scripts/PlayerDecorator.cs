@@ -7,6 +7,8 @@ using UnityEngine;
 public class PlayerDecorator : NetworkBehaviour
 {
   private TextMesh _label;
+
+  private Renderer _body;
   private Renderer _nose;
   private PlayerRole _role;
   public Color ownerColor = new Color(0.3f, 0.8f, 1f);
@@ -16,6 +18,7 @@ public class PlayerDecorator : NetworkBehaviour
   void Awake()
   {
     CacheNose();
+    CatchBody();
     EnsureLabel();
   }
 
@@ -76,6 +79,33 @@ public class PlayerDecorator : NetworkBehaviour
     }
   }
 
+  void CatchBody()
+  {
+    // 名前が "Body" の直下または階層内の子 Transform を探す（まずは直下）
+    var bodyTf = transform.Find("Body");
+    // 次に階層内も探す
+    if (bodyTf == null)
+    {
+      foreach (var t in GetComponentsInChildren<Transform>(true))
+      {
+        if (t.name == "Body") { bodyTf = t; break; }
+      }
+    }
+    if (bodyTf != null) _body = bodyTf.GetComponentInChildren<Renderer>();
+
+    if (_body == null)
+    {
+      var fb = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+      fb.name = "Body";
+      fb.transform.SetParent(transform, false);
+      fb.transform.localPosition = new Vector3(0, 1f, 0);
+      fb.transform.localScale = new Vector3(1f, 1f, 1f);
+      fb.transform.localRotation = Quaternion.Euler(0, 0, 0);
+      _body = fb.GetComponent<Renderer>();
+    }
+  }
+
+
   void EnsureLabel()
   {
     var t = transform.Find("RoleLabel");
@@ -107,6 +137,7 @@ public class PlayerDecorator : NetworkBehaviour
     Color c = isMine ? ownerColor : remoteColor;
     if (role == "HOST" && isMine) c = hostEmphasis;
     if (_nose) _nose.material.color = c;
+    if (_body) _body.material.color = c;
     if (_label) _label.color = c;
   }
 }
