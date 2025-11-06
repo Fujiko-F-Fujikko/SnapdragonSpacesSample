@@ -25,18 +25,23 @@ public class PlayerMovement : NetworkBehaviour
   {
     controller = GetComponent<CharacterController>();
     isVRActive = XRSettings.isDeviceActive;
-    playerCamera = Camera.main;
+
+    // プレイヤーカメラを取得(XROrigin内のMain Camera)
+    GameObject camObj = GameObject.Find("Main Camera");
+    if (camObj != null)
+    {
+      playerCamera = camObj.GetComponent<Camera>();
+    }
+    else
+    {
+      Debug.LogWarning("PlayerMovement: Main Camera not found in Awake.");
+    }
   }
 
   public override void OnNetworkSpawn()
   {
     base.OnNetworkSpawn();
-
-    // 所有しているPlayerのみカメラON
-    if (playerCamera != null)
-      playerCamera.enabled = IsOwner;
   }
-
   void Update()
   {
     if (!IsOwner) return;
@@ -53,11 +58,13 @@ public class PlayerMovement : NetworkBehaviour
     UnityEngine.XR.InputDevice leftHand = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
     UnityEngine.XR.InputDevice rightHand = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
 
-    Vector2 moveInput = Vector2.zero;
-    Vector2 turnInput = Vector2.zero;
+    Vector2 moveInput = new Vector2(1.0f, 1.0f); //Vector2.zero;
+    Vector2 turnInput = new Vector2(1.0f, 1.0f); //Vector2.zero;
 
     leftHand.TryGetFeatureValue(UnityEngine.XR.CommonUsages.primary2DAxis, out moveInput);
     rightHand.TryGetFeatureValue(UnityEngine.XR.CommonUsages.primary2DAxis, out turnInput);
+
+    //Debug.Log("PlayerMovement: playerCamera found in VR mode: " + playerCamera.gameObject.name);
 
     // HMDの向きに合わせて移動
     if (playerCamera == null)

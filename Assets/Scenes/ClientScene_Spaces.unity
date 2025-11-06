@@ -847,9 +847,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65166cfb30999ad45953a7849bcdda44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifecycle: {fileID: 0}
-  retryInterval: 0.1
-  retryTimeout: 5
 --- !u!4 &782628377
 Transform:
   m_ObjectHideFlags: 0
@@ -1722,7 +1719,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1b87ccecb52e12418785a62f514e58d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverIp: 192.168.68.71
+  serverIp: 192.168.176.222
   port: 7777
   autoReconnect: 1
   retryIntervalSeconds: 3

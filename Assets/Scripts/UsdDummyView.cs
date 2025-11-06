@@ -26,6 +26,8 @@ public class UsdDummyView : NetworkBehaviour
 
   public override void OnNetworkSpawn()
   {
+    Debug.Log($"[USD-Dummy] UsdDummyView spawned: {usdPath.Value}", this);
+
     // Transform
     ApplyTransform(worldPos.Value, worldRot.Value, worldScale.Value);
 
@@ -103,10 +105,14 @@ public class UsdDummyView : NetworkBehaviour
           go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
           break;
         case 3: // Camera
-          // Cameraオブジェクトを作成
-          go = new GameObject("Camera");
-          go.AddComponent<Camera>();
-          go.AddComponent<MeshRenderer>(); // ダミーのMeshRendererを追加
+          // Server/Hostの場合のみ、Cameraオブジェクトを作成
+          // (Clientで作成するとCameraが取られてしまうので)
+          if (IsServer || IsHost)
+          {
+            go = new GameObject("Camera");
+            go.AddComponent<Camera>();
+            go.AddComponent<MeshRenderer>(); // ダミーのMeshRendererを追加
+          }
           break;
         default:
           // 不明ならCubeにしちゃう
