@@ -51,7 +51,16 @@ public class PlayerDecorator : NetworkBehaviour
 
   void CacheNose()
   {
+    // 名前が "Nose" の直下または階層内の子 Transform を探す（まずは直下）
     var noseTf = transform.Find("Nose");
+    // 次に階層内も探す
+    if (noseTf == null)
+    {
+      foreach (var t in GetComponentsInChildren<Transform>(true))
+      {
+        if (t.name == "Nose") { noseTf = t; break; }
+      }
+    }
     if (noseTf != null) _nose = noseTf.GetComponentInChildren<Renderer>();
 
     if (_nose == null)
@@ -61,6 +70,7 @@ public class PlayerDecorator : NetworkBehaviour
       fb.transform.SetParent(transform, false);
       fb.transform.localPosition = new Vector3(0, 0.6f, 0.5f);
       fb.transform.localScale = new Vector3(0.12f, 0.12f, 0.12f);
+      fb.transform.localRotation = Quaternion.Euler(90, 0, 0);
       _nose = fb.GetComponent<Renderer>();
     }
   }
