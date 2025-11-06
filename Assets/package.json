@@ -1,0 +1,17 @@
+{
+  "name": "com.sony.wiars.ngo-sync",
+  "version": "0.1.0",
+  "displayName": "WIARS: NGO Sync",
+  "description": "Sync Netcode Game Object via Server-Client.",
+  "unity": "2022.3",
+  "author": {
+    "name": "Sony",
+    "url": "https://www.sony.com"
+  },
+  "dependencies": {
+    "com.unity.netcode.gameobjects": "1.7.1",
+    "com.unity.transport": "1.4.1",
+    "com.unity.formats.usd": "3.0.0-exp.5"
+  },
+  "samples": []
+}

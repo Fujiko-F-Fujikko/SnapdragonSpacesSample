@@ -339,7 +339,7 @@ GameObject:
   - component: {fileID: 1192540803}
   - component: {fileID: 1192540805}
   m_Layer: 0
-  m_Name: USDPrefabSpawner
+  m_Name: NGOSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
