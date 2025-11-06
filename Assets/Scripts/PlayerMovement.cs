@@ -11,12 +11,10 @@ using UnityEngine.XR;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : NetworkBehaviour
 {
-  [Header("移動設定")]
+  [Header("Movement Settings")]
   public float moveSpeed = 2.5f;
   public float turnSpeed = 90f;
   public float mouseSensitivity = 3f;
-
-  [Header("参照設定")]
   private Camera playerCamera;  // FPSモードのカメラ or VR HMDカメラ
 
   private CharacterController controller;
