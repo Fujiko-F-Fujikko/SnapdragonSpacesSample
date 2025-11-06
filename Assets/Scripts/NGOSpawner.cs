@@ -1,3 +1,4 @@
+#if HAS_UNITY_USD
 using Unity.Netcode;
 using UnityEngine;
 
@@ -23,3 +24,11 @@ public class NGOSpawner : NetworkBehaviour
     }
   }
 }
+# else
+using UnityEngine;
+public class NGOSpawner : MonoBehaviour
+{
+  [SerializeField] private bool logOnce = true;
+  void Awake() { if (logOnce) Debug.Log("[USD-Net] NGOSpawner disabled (HAS_UNITY_USD not defined).", this); }
+}
+#endif

@@ -7,7 +7,9 @@
         "GUID:f2d49d9fa7e7eb3418e39723a7d3b92f",
         "GUID:fbb89535e17e84eae8079c2158650d01",
         "GUID:75469ad4d38634e559750d17036d5f7c",
-        "GUID:e0cd26848372d4e5c891c569017e11f1"
+        "GUID:e0cd26848372d4e5c891c569017e11f1",
+        "GUID:79868382c2b85f84db22a4a888cf0834",
+        "GUID:4847341ff46394e83bb78fbd0652937e"
     ],
     "includePlatforms": [
         "Android",
@@ -20,22 +22,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "com.unity.transport",
-            "expression": "1.4.1",
-            "define": "HAS_UNITY_TRANSPORT"
-        },
-        {
-            "name": "com.unity.netcode.gameobjects",
-            "expression": "1.7.1",
-            "define": "HAS_UNITY_NETCODE_GAMEOBJECTS"
-        },
-        {
-            "name": "com.unity.formats.usd",
-            "expression": "3.0.0-exp.5",
-            "define": "HAS_UNITY_USD"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }
