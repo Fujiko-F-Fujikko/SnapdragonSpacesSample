@@ -16,6 +16,10 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
   [Tooltip("同じGameObjectに付いている UsdAsset。未指定なら自動取得します")]
   [SerializeField] private UsdAsset usdAsset;
 
+  [Header("Spawnable Objects")]
+  [Tooltip("Spawnableとして扱うオブジェクトのキーワードリスト")]
+  [SerializeField] private List<string> spawnableObjectKeywordList;
+
   [Header("Options")]
   [Tooltip("NGO使用時、Server/Host のときだけ動かす")]
   [SerializeField] private bool onlyIfServer = true;
@@ -187,40 +191,22 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
 
   byte GuessVisualKind(string usdPath, Transform tr)
   {
-    // 例1: パスで判定
+    // 既定のオブジェクト(0~9)
     if (usdPath.Contains("Cube"))
       return 0; // Cube
     if (usdPath.Contains("Sphere"))
       return 1; // Sphere
     if (usdPath.Contains("Cylinder"))
       return 2; // Cylinder
-
     if (usdPath.Contains("Camera"))
       return 3; // Camera
 
-    // 例2: USD側で "SM_" を付けておいて、それをカスタムMeshにする
-    if (usdPath.Contains("Spoon"))
-      return 10;   // customMesh0
-    if (usdPath.Contains("Crayon"))
-      return 11;   // customMesh1
-    if (usdPath.Contains("Chair"))
-      return 12;   // customMesh2
-    if (usdPath.Contains("CafeTableParasol"))
-      return 13;   // customMesh3
-    if (usdPath.Contains("CafeTableSet"))
-      return 14;   // customMesh4
-    if (usdPath.Contains("Coffee"))
-      return 15;   // customMesh5
-    if (usdPath.Contains("Laptop"))
-      return 16;   // customMesh6
-    if (usdPath.Contains("Plant_01"))
-      return 17;   // customMesh7
-    if (usdPath.Contains("Plant_02"))
-      return 18;   // customMesh8
-    if (usdPath.Contains("Plant_03"))
-      return 19;   // customMesh9
-    if (usdPath.Contains("UFO"))
-      return 20;   // customMesh10
+    // Spawnableオブジェクト(10~)
+    for (int i = 0; i < spawnableObjectKeywordList.Count; i++)
+    {
+      if (usdPath.Contains(spawnableObjectKeywordList[i]))
+        return (byte)(10 + i);   // customMesh0 から順に割り当て
+    }
 
     // 何も当たらなければCube
     return 0;
