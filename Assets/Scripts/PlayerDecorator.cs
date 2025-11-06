@@ -3,6 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(NetworkObject))]
+[RequireComponent(typeof(PlayerRole))]
 public class PlayerDecorator : NetworkBehaviour
 {
   private TextMesh _label;

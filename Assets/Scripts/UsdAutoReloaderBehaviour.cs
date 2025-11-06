@@ -33,9 +33,6 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
   [Tooltip("リロードしたUSDが生成するGameObjectに NetworkObject を自動付与して Spawn する")]
   [SerializeField] private bool autoNetworkize = true;
 
-  [Tooltip("すでに NetworkObject が付いているものは再Spawnしない")]
-  [SerializeField] private bool skipExistingNetworkObjects = true;
-
   // ▼ 追加: ダミーのNetwork Object
   [SerializeField] private GameObject dummyNetworkObjectPrefab;
 

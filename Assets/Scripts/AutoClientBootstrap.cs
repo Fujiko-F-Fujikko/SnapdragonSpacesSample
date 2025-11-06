@@ -15,7 +15,7 @@ public class AutoClientBootstrap : MonoBehaviour
 {
   [Header("Server Endpoint (設定してビルド)")]
   [Tooltip("サーバーのIPv4アドレス (例: 192.168.19.192)")]
-  public string serverIp = "192.168.0.2";
+  public string serverIp = "127.0.0.1";
 
   [Tooltip("接続ポート (UnityTransport側と一致させる)")]
   public ushort port = 7777;

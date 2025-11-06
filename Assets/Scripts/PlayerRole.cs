@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
+[RequireComponent(typeof(NetworkObject))]
 public class PlayerRole : NetworkBehaviour
 {
   public NetworkVariable<FixedString32Bytes> Role =

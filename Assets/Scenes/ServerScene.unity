@@ -516,7 +516,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c20562322e992e408aa445c204bcabe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usdPrefab: {fileID: 4900695096538100034, guid: 54350134be84b84448dd71f10f6e5a23, type: 3}
+  networkObject: {fileID: 4900695096538100034, guid: 54350134be84b84448dd71f10f6e5a23, type: 3}
   spawnPosition: {x: 0, y: 0, z: 3}
   spawnRotation: {x: 0, y: 0, z: 0}
   spawnScale: {x: 1, y: 1, z: 1}

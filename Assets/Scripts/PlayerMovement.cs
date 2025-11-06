@@ -9,7 +9,7 @@ using UnityEngine.XR;
 /// 自分が所有しているPlayerのみ操作できる。
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
-public class PlayerMovementUnified : NetworkBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
   [Header("移動設定")]
   public float moveSpeed = 2.5f;
@@ -64,7 +64,7 @@ public class PlayerMovementUnified : NetworkBehaviour
     // HMDの向きに合わせて移動
     if (playerCamera == null)
     {
-      Debug.LogWarning("PlayerMovementUnified: playerCamera is null in VR mode.");
+      Debug.LogWarning("PlayerMovement: playerCamera is null in VR mode.");
       return;
     }
     Transform head = playerCamera.transform;
