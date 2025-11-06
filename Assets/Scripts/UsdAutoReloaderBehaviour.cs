@@ -1,13 +1,9 @@
 // --- USDパッケージがあるビルド（Editor/Serverなど）向け本体 ---
 #if HAS_UNITY_USD
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Unity.Formats.USD;
-using Unity.Netcode;
 using UnityEngine;
-
-
 
 [DisallowMultipleComponent]
 public class UsdAutoReloaderBehaviour : MonoBehaviour
@@ -16,14 +12,7 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
   [Tooltip("同じGameObjectに付いている UsdAsset。未指定なら自動取得します")]
   [SerializeField] private UsdAsset usdAsset;
 
-  [Header("Spawnable Objects")]
-  [Tooltip("Spawnableとして扱うオブジェクトのキーワードリスト")]
-  [SerializeField] private List<string> spawnableObjectKeywordList;
-
-  [Header("Options")]
-  [Tooltip("NGO使用時、Server/Host のときだけ動かす")]
-  [SerializeField] private bool onlyIfServer = true;
-
+  [Header("Watcher Options")]
   [Tooltip("更新チェック間隔（秒）")]
   [SerializeField] private float pollInterval = 0.5f;
 
@@ -32,19 +21,8 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
 
   [SerializeField] private bool verboseLog = false;
 
-  // ▼ 追加: リロード後に子GameObjectを自動でネットワーク化するか
-  [Header("Networkize")]
-  [Tooltip("リロードしたUSDが生成するGameObjectに NetworkObject を自動付与して Spawn する")]
-  [SerializeField] private bool autoNetworkize = true;
-
-  // ▼ 追加: ダミーのNetwork Object
-  [SerializeField] private GameObject dummyNetworkObjectPrefab;
-
-  // ▼ 追加: どのTransform以下を対象にするか（未指定ならこのGameObject以下）
-  [SerializeField] private Transform networkizeRoot;
-
-  private readonly List<NetworkObject> _spawnedDummies = new();
-
+  // USDリロード完了通知イベント
+  public event Action<UsdAsset> OnUsdReloaded;
 
   string _path;
   DateTime _lastWriteUtc;
@@ -59,17 +37,6 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
       enabled = false; return;
     }
 
-    if (NetworkManager.Singleton == null)
-    {
-      Debug.Log("[USD] UsdAutoReloaderBehaviour disabled (no NetworkManager).", this);
-      enabled = false; return;
-    }
-    if (onlyIfServer && !NetworkManager.Singleton.IsServer)
-    {
-      Debug.Log("[USD] UsdAutoReloaderBehaviour disabled (not server).", this);
-      enabled = false; return;
-    }
-
     _path = usdAsset.usdFullPath;
     if (string.IsNullOrEmpty(_path) || !File.Exists(_path))
     {
@@ -80,8 +47,6 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
     _lastWriteUtc = File.GetLastWriteTimeUtc(_path);
     _nextPollAt = Time.unscaledTime + pollInterval;
     if (verboseLog) Debug.Log($"[USD] Watching: {_path}", this);
-
-    if (!networkizeRoot) networkizeRoot = this.transform;
   }
 
   void Update()
@@ -116,135 +81,25 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
 
   public void TryReload()
   {
-    // ★前回のダミーを片付ける
-    if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
-    {
-      DespawnAllDummies();
-    }
-
     if (!usdAsset) return;
     try
     {
-      // USDをその場で更新
-      usdAsset.Reload(true);   // ★ “その場更新” (NetworkObjectを壊さない)
+      usdAsset.Reload(true);   // その場更新
       if (verboseLog) Debug.Log("[USD] Reload(true) executed.", this);
-
-      // ▼ 追加: 更新後にネットワーク化してSpawnする
-      if (autoNetworkize)
-      {
-        NetworkizeSpawnCreatedObjects();
-      }
+      OnUsdReloaded?.Invoke(usdAsset);
     }
     catch (Exception ex)
     {
       Debug.LogException(ex, this);
     }
   }
-
-  /// <summary>
-  /// USDの再ロードで生成/更新されたGameObjectに NetworkObject を付けて Spawn する
-  /// </summary>
-  // UsdAutoReloaderBehaviour 側
-  void NetworkizeSpawnCreatedObjects()
-  {
-    if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer)
-      return;
-
-    var root = networkizeRoot ? networkizeRoot : this.transform;
-
-    foreach (var tr in root.GetComponentsInChildren<Transform>(true))
-    {
-      if (tr == this.transform) continue;
-      if (!tr.GetComponent<MeshRenderer>() && !tr.GetComponent<Camera>()) continue;
-
-      var go = Instantiate(dummyNetworkObjectPrefab);
-      var no = go.GetComponent<NetworkObject>();
-      var view = go.GetComponent<UsdDummyView>();
-
-      no.Spawn();
-
-      tr.gameObject.SetActive(false); // USDファイルから読み込んだそのものは見せない
-
-      Color col = ExtractColorFromUsdNode(tr);
-
-      // USD側のパスは今まで通り
-      string usdPath = tr.GetComponent<UsdPrimSource>().m_usdPrimPath;
-
-      Debug.Log("tr name:" + tr.gameObject.name + " usdPath:" + usdPath);
-
-      // ★ ここで種類を決める
-      byte kind = GuessVisualKind(usdPath, tr);
-
-      view.ServerInit(
-          usdPath,
-          tr.position,
-          tr.rotation,
-          tr.lossyScale,
-          col,
-          kind
-      );
-
-      // ★ Spawnしたら覚えておく
-      _spawnedDummies.Add(no);
-    }
-  }
-
-  byte GuessVisualKind(string usdPath, Transform tr)
-  {
-    // 既定のオブジェクト(0~9)
-    if (usdPath.Contains("Cube"))
-      return 0; // Cube
-    if (usdPath.Contains("Sphere"))
-      return 1; // Sphere
-    if (usdPath.Contains("Cylinder"))
-      return 2; // Cylinder
-    if (usdPath.Contains("Camera"))
-      return 3; // Camera
-
-    // Spawnableオブジェクト(10~)
-    for (int i = 0; i < spawnableObjectKeywordList.Count; i++)
-    {
-      if (usdPath.Contains(spawnableObjectKeywordList[i]))
-        return (byte)(10 + i);   // customMesh0 から順に割り当て
-    }
-
-    // 何も当たらなければCube
-    return 0;
-  }
-
-  Color ExtractColorFromUsdNode(Transform tr)
-  {
-    var mr = tr.GetComponentInChildren<MeshRenderer>();
-    if (mr && mr.sharedMaterial && mr.sharedMaterial.HasProperty("_Color"))
-    {
-      return mr.sharedMaterial.color;
-    }
-    return Color.white;
-  }
-
-  void DespawnAllDummies()
-  {
-    // サーバーだけがDespawnする
-    if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer)
-      return;
-
-    foreach (var no in _spawnedDummies)
-    {
-      if (no == null) continue;
-      // true を渡すとクライアント側でもGameObjectごと消える
-      no.Despawn(true);
-    }
-
-    _spawnedDummies.Clear();
-  }
-
 }
 #else
 // --- USDパッケージが無いビルド（クライアント等）でもコンパイルが通るダミー ---
 using UnityEngine;
 public class UsdAutoReloaderBehaviour : MonoBehaviour
 {
-    [SerializeField] private bool logOnce = true;
-    void Awake() { if (logOnce) Debug.Log("[USD] UsdAutoReloaderBehaviour disabled (HAS_UNITY_USD not defined).", this); }
+  [SerializeField] private bool logOnce = true;
+  void Awake() { if (logOnce) Debug.Log("[USD] UsdAutoReloaderBehaviour disabled (HAS_UNITY_USD not defined).", this); }
 }
 #endif
