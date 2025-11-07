@@ -111,6 +111,7 @@ public class UsdDummyView : NetworkBehaviour
           {
             go = new GameObject("Camera");
             go.AddComponent<Camera>();
+            go.GetComponent<Camera>().tag = "MainCamera";
             go.AddComponent<MeshRenderer>(); // ダミーのMeshRendererを追加
           }
           break;

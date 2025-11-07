@@ -1,116 +1,185 @@
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem; // 新Input System対応
+#if UNITY_XR_MANAGEMENT
+using UnityEngine.XR.Management;
+#endif
 using UnityEngine.XR;
+using Unity.XR.CoreUtils;
 
-/// <summary>
-/// VR接続時はHMD＋スティックで移動、
-/// 非VR時はWASD＋マウス視点で操作する統合スクリプト。
-/// 自分が所有しているPlayerのみ操作できる。
-/// </summary>
-[RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : NetworkBehaviour
 {
-  [Header("Movement Settings")]
-  public float moveSpeed = 2.5f;
-  public float turnSpeed = 90f;
-  public float mouseSensitivity = 3f;
-  private Camera playerCamera;  // FPSモードのカメラ or VR HMDカメラ
+  // ===== Desktop (XZのみ／重力なし) =====
+  [Header("Desktop Controls (XZ only)")]
+  public float moveSpeed = 3.5f;
+  public float sprintMultiplier = 1.5f;
+  public bool lockCursor = true;
+  public float mouseSensitivity = 2.0f;
+  public bool cameraPitch = true;
+  public float pitchMin = -80f, pitchMax = 80f;
 
-  private CharacterController controller;
-  private bool isVRActive = false;
-  private float verticalLookRotation = 0f;
+  // --- Internals ---
 
-  private void Awake()
+  // XR用
+  XROrigin _xr;
+  Camera _hmdCam;               // HMDカメラ
+
+  // Desktop用
+  float _yaw, _pitch;
+
+  // 共通
+  Transform _rig;               // 動かす対象
+  CharacterController _rigCC;   // _rigに付いているCharacterController(Playerプレハブに付いている想定)
+
+
+  // ===== Unity callbacks =====
+
+  void Awake()
   {
-    controller = GetComponent<CharacterController>();
-    isVRActive = XRSettings.isDeviceActive;
+    _rig = transform; // 自分自身
+    _rigCC = _rig.GetComponent<CharacterController>();
 
-    // プレイヤーカメラを取得(XROrigin内のMain Camera)
-    GameObject camObj = GameObject.Find("Main Camera");
-    if (camObj != null)
-    {
-      playerCamera = camObj.GetComponent<Camera>();
-    }
-    else
-    {
-      Debug.LogWarning("PlayerMovement: Main Camera not found in Awake.");
-    }
   }
-
   public override void OnNetworkSpawn()
   {
-    base.OnNetworkSpawn();
+    Debug.Log("[PlayerMovement] OnNetworkSpawn called.");
+
+    Debug.Log($"[PlayerMovement] IsOwner: {IsOwner}, IsServer: {IsServer}, IsClient: {IsClient}");
+    if (!IsOwner) { enabled = false; return; }
+
+    if (XRActive)
+    {
+      // XR初期化
+      var xrOrigin_obj = GameObject.Find("XR Origin (XR Rig)");
+      if (xrOrigin_obj == null) { Debug.LogError("XROrigin not found on this Player."); enabled = false; return; }
+      _xr = xrOrigin_obj.GetComponent<XROrigin>();
+      if (_xr == null) { Debug.LogError("XROrigin component not found."); enabled = false; return; }
+      Debug.Log($"[PlayerMovement] XROrigin found: {_xr.gameObject.name}");
+
+      _hmdCam = _xr.Camera;
+      if (_hmdCam == null) { Debug.LogError("XR Camera not found on XROrigin."); enabled = false; return; }
+      // （任意）自分のカメラとAudioListenerをONにしている前提
+      //var al = _hmdCam.GetComponent<AudioListener>(); if (al) al.enabled = true;
+    }
+    else
+    {
+      // Desktop初期化
+      _yaw = _rig.eulerAngles.y; _pitch = 0f;
+      if (lockCursor) { Cursor.lockState = CursorLockMode.Locked; Cursor.visible = false; }
+    }
   }
+
+  void OnDisable()
+  {
+    if (IsOwner && lockCursor)
+    {
+      Cursor.lockState = CursorLockMode.None;
+      Cursor.visible = true;
+    }
+  }
+
+  // Update はデスクトップのみ
   void Update()
   {
+    Debug.Log("[PlayerMovement] Update called. IsOwner: " + IsOwner + ", XRActive: " + XRActive);
     if (!IsOwner) return;
 
-    if (isVRActive)
-      HandleVRMovement();
+    Debug.Log($"  XRActive: {XRActive}");
+    if (XRActive)
+      UpdateXR_ByXROrigin();
     else
-      HandleDesktopMovement();
+      UpdateDesktop();
   }
 
-  // ----------- VRモード -----------
-  void HandleVRMovement()
-  {
-    UnityEngine.XR.InputDevice leftHand = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
-    UnityEngine.XR.InputDevice rightHand = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-
-    Vector2 moveInput = new Vector2(1.0f, 1.0f); //Vector2.zero;
-    Vector2 turnInput = new Vector2(1.0f, 1.0f); //Vector2.zero;
-
-    leftHand.TryGetFeatureValue(UnityEngine.XR.CommonUsages.primary2DAxis, out moveInput);
-    rightHand.TryGetFeatureValue(UnityEngine.XR.CommonUsages.primary2DAxis, out turnInput);
-
-    //Debug.Log("PlayerMovement: playerCamera found in VR mode: " + playerCamera.gameObject.name);
-
-    // HMDの向きに合わせて移動
-    if (playerCamera == null)
+  /*
+    // XR 追従は LateUpdate で1回
+    void LateUpdate()
     {
-      Debug.LogWarning("PlayerMovement: playerCamera is null in VR mode.");
-      return;
+      Debug.Log("[PlayerMovement] LateUpdate called. IsOwner: " + IsOwner + ", XRActive: " + XRActive);
+      if (!IsOwner) return;
+      if (XRActive) UpdateXR_ByXROrigin();
     }
-    Transform head = playerCamera.transform;
-    Vector3 forward = new Vector3(head.forward.x, 0, head.forward.z).normalized;
-    Vector3 right = new Vector3(head.right.x, 0, head.right.z).normalized;
+    */
 
-    Vector3 move = (forward * moveInput.y + right * moveInput.x) * moveSpeed;
-    controller.Move(move * Time.deltaTime);
-
-    // 右スティックで回転
-    if (Mathf.Abs(turnInput.x) > 0.2f)
-      transform.Rotate(Vector3.up, turnInput.x * turnSpeed * Time.deltaTime);
+  // ローカル回転版（親空間での前方向の水平成分）
+  Quaternion YawOnlyLocal(Quaternion localQ)
+  {
+    Vector3 f = localQ * Vector3.forward; f.y = 0f;
+    if (f.sqrMagnitude < 1e-8f) return Quaternion.identity;
+    return Quaternion.LookRotation(f.normalized, Vector3.up);
   }
 
-  // ----------- PCモード -----------
-  void HandleDesktopMovement()
+  void UpdateXR_ByXROrigin()
   {
-    var keyboard = Keyboard.current;
-    if (keyboard == null) return;
+    Debug.Log("[PlayerMovement] UpdateXR_ByXROrigin called.");
+    Debug.Log($"  _rig: {_rig.name}, _hmdCam: {_hmdCam.name}");
+    if (_rig == null || _hmdCam == null) return;
 
-    Vector3 move = Vector3.zero;
-    if (keyboard.wKey.isPressed) move += transform.forward;
-    if (keyboard.sKey.isPressed) move -= transform.forward;
-    if (keyboard.aKey.isPressed) move -= transform.right;
-    if (keyboard.dKey.isPressed) move += transform.right;
+    // 1) 今フレームのHMDワールド姿勢
+    var headWorldPos = _hmdCam.transform.position;
+    var headWorldRot = _hmdCam.transform.rotation;
+    Debug.Log($"  Head World Pos: {headWorldPos}, Head World Rot: {headWorldRot}");
 
-    controller.Move(move.normalized * moveSpeed * Time.deltaTime);
 
-    // マウス視点回転
-    var mouse = Mouse.current;
-    if (mouse != null)
+    var headLocalYaw = YawOnlyLocal(_hmdCam.transform.localRotation);
+    Debug.Log($"  HeadLocalYaw: {headLocalYaw.eulerAngles}");
+
+    // 3) 現在のリグ空間でのカメラ位置（Camera Offsetの変化を含む）
+    var camLocalInOrigin = _xr.CameraInOriginSpacePos;
+    Debug.Log($"  CamLocalInOrigin: {camLocalInOrigin}");
+
+    _rig.transform.position = camLocalInOrigin;
+    _rig.transform.rotation = headLocalYaw;
+
+    // これは吹っ飛ぶ
+    //_rig.transform.position = headWorldPos;
+    //_rig.transform.rotation = headWorldRot;
+  }
+
+  // ===== Desktop：XR Origin を WASD＋マウスで操作（XZのみ・重力なし） =====
+  void UpdateDesktop()
+  {
+    // マウスルック（YawはOrigin、Pitchはカメラ）
+    float mx = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
+    float my = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+
+    _yaw += mx;
+    _rig.rotation = Quaternion.Euler(0f, _yaw, 0f);
+
+    if (cameraPitch && _hmdCam != null)
     {
-      float mouseX = mouse.delta.x.ReadValue() * mouseSensitivity * Time.deltaTime;
-      float mouseY = mouse.delta.y.ReadValue() * mouseSensitivity * Time.deltaTime;
+      _pitch = Mathf.Clamp(_pitch - my, pitchMin, pitchMax);
+      _hmdCam.transform.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
+    }
 
-      transform.Rotate(Vector3.up * mouseX);
-      verticalLookRotation -= mouseY;
-      verticalLookRotation = Mathf.Clamp(verticalLookRotation, -80f, 80f);
+    // XZのみ移動
+    Vector2 inMove = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+    if (inMove.sqrMagnitude > 1f) inMove.Normalize();
 
-      if (playerCamera != null)
-        playerCamera.transform.localRotation = Quaternion.Euler(verticalLookRotation, 0, 0);
+    float speed = moveSpeed * (Input.GetKey(KeyCode.LeftShift) ? sprintMultiplier : 1f);
+    Vector3 moveXZ = (_rig.right * inMove.x + _rig.forward * inMove.y) * speed;
+
+    if (_rigCC) _rigCC.Move(moveXZ * Time.deltaTime);
+    else _rig.position += moveXZ * Time.deltaTime;
+
+    // 高さは固定
+    float height = _rigCC.height;
+    _rig.position = new Vector3(_rig.position.x, height / 2f, _rig.position.z);
+  }
+
+  // ===== XRの有効判定（Android 実機は常にXR扱い） =====
+  bool XRActive
+  {
+    get
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            return true; // Androidビルドは常にXR扱い（Quest/Pico等）
+#else
+#if UNITY_XR_MANAGEMENT
+            var g = XRGeneralSettings.Instance;
+            if (g != null && g.Manager != null && g.Manager.activeLoader != null) return true;
+#endif
+      return XRSettings.enabled; // フォールバック
+#endif
     }
   }
 }
