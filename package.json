@@ -11,8 +11,7 @@
   "dependencies": {
     "com.unity.netcode.gameobjects": "1.7.1",
     "com.unity.transport": "1.4.1",
-    "com.unity.formats.usd": "3.0.0-exp.5",
-    "com.unity.inputsystem": "1.7.0"
+    "com.unity.formats.usd": "3.0.0-exp.5"
   },
   "samples": []
 }
