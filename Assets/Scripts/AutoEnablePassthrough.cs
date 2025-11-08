@@ -5,7 +5,7 @@ using Qualcomm.Snapdragon.Spaces;
 using UnityEngine;
 using UnityEngine.XR.OpenXR;
 
-public class EnablePassthroughRobust : MonoBehaviour
+public class AutoEnablePassthrough : MonoBehaviour
 {
   [SerializeField] SpacesLifecycleEvents lifecycle; // ヒエラルキーから割当
   [SerializeField] float retryInterval = 0.1f;      // 100ms

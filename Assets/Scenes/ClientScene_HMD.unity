@@ -239,26 +239,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 208806395}
-  - component: {fileID: 208806394}
+  - component: {fileID: 208806396}
   m_Layer: 0
-  m_Name: EnablePassthroughRobust
+  m_Name: AutoEnablePassthrough
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &208806394
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 208806393}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65166cfb30999ad45953a7849bcdda44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &208806395
 Transform:
   m_ObjectHideFlags: 0
@@ -274,6 +262,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &208806396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208806393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65166cfb30999ad45953a7849bcdda44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -2664,9 +2664,9 @@ SceneRoots:
   - {fileID: 177352617}
   - {fileID: 1622502065}
   - {fileID: 1532801978}
+  - {fileID: 208806395}
   - {fileID: 1965952193}
   - {fileID: 2024201814}
   - {fileID: 1614854795}
   - {fileID: 1960124745}
   - {fileID: 2089586245}
-  - {fileID: 208806395}
