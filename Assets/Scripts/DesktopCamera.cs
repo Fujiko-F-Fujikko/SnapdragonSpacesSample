@@ -6,7 +6,7 @@ using UnityEngine.XR;
 public class DesktopCamera : MonoBehaviour
 {
   [Header("Follow Local Player (Netcode)")]
-  [SerializeField] private Vector3 positionOffset = new Vector3(0, 0.75f, 0f); // Applied in player's local space
+  [SerializeField] private Vector3 positionOffset = new Vector3(0f, 0f, 0f); // Applied in player's local space
   [SerializeField] private Vector3 rotationOffsetEuler = Vector3.zero; // Added to player rotation
 
   private Transform playerTransform; // Cached local player transform

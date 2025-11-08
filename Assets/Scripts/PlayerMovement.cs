@@ -10,9 +10,9 @@ public class PlayerMovement : NetworkBehaviour
 {
   // ===== Desktop (XZのみ／重力なし) =====
   [Header("Desktop Controls (XZ only)")]
+  public float floorHeight = 0f; // 床の高さ（Y座標）
   public float moveSpeed = 3.5f;
   public float sprintMultiplier = 1.5f;
-  public bool lockCursor = true;
   public float mouseSensitivity = 2.0f;
   public bool cameraPitch = true;
   public float pitchMin = -80f, pitchMax = 80f;
@@ -42,6 +42,8 @@ public class PlayerMovement : NetworkBehaviour
   public override void OnNetworkSpawn()
   {
     Debug.Log("[PlayerMovement] OnNetworkSpawn called.");
+    Debug.Log($"  XRActive: {XRActive}");
+
 
     Debug.Log($"[PlayerMovement] IsOwner: {IsOwner}, IsServer: {IsServer}, IsClient: {IsClient}");
     if (!IsOwner) { enabled = false; return; }
@@ -64,26 +66,14 @@ public class PlayerMovement : NetworkBehaviour
     {
       // Desktop初期化
       _yaw = _rig.eulerAngles.y; _pitch = 0f;
-      if (lockCursor) { Cursor.lockState = CursorLockMode.Locked; Cursor.visible = false; }
-    }
-  }
-
-  void OnDisable()
-  {
-    if (IsOwner && lockCursor)
-    {
-      Cursor.lockState = CursorLockMode.None;
-      Cursor.visible = true;
     }
   }
 
   // Update はデスクトップのみ
   void Update()
   {
-    Debug.Log("[PlayerMovement] Update called. IsOwner: " + IsOwner + ", XRActive: " + XRActive);
     if (!IsOwner) return;
 
-    Debug.Log($"  XRActive: {XRActive}");
     if (XRActive)
       UpdateXR_ByXROrigin();
     else
@@ -163,7 +153,7 @@ public class PlayerMovement : NetworkBehaviour
 
     // 高さは固定
     float height = _rigCC.height;
-    _rig.position = new Vector3(_rig.position.x, height / 2f, _rig.position.z);
+    _rig.position = new Vector3(_rig.position.x, height / 2f - _rigCC.center.y + floorHeight, _rig.position.z);
   }
 
   // ===== XRの有効判定（Android 実機は常にXR扱い） =====

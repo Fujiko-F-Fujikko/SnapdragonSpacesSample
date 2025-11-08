@@ -63,6 +63,8 @@ public class UsdDummyView : NetworkBehaviour
 
   void OnVisualKindChanged(byte prev, byte now)
   {
+    Debug.Log($"[USD-Dummy] VisualKind changed: {prev} -> {now}", this);
+
     // 見た目を作り直す
     _renderer = EnsureVisual(now, usdPath.Value.ToString());
     ApplyColor(displayColor.Value);
@@ -89,7 +91,7 @@ public class UsdDummyView : NetworkBehaviour
 
     if (kind >= 10)
     {
-      go = CreateFromMesh(meshTable[kind - 10]);
+      go = CreateFromMesh(kind);
     }
     else
     {
@@ -105,14 +107,16 @@ public class UsdDummyView : NetworkBehaviour
           go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
           break;
         case 3: // Camera
-          // Server/Hostの場合のみ、Cameraオブジェクトを作成
+          go = new GameObject("Camera");
+          go.AddComponent<Camera>();
+          go.GetComponent<Camera>().tag = "MainCamera";
+          go.AddComponent<MeshRenderer>(); // ダミーのMeshRendererを追加
+          // Clientでは無効にする. Hostでは有効にする
           // (Clientで作成するとCameraが取られてしまうので)
-          if (IsServer || IsHost)
+          Debug.Log($"[USD-Dummy] Creating Camera. IsHost: {IsHost}, IsClient: {IsClient}, IsServer: {IsServer}", this);
+          if (IsClient)
           {
-            go = new GameObject("Camera");
-            go.AddComponent<Camera>();
-            go.GetComponent<Camera>().tag = "MainCamera";
-            go.AddComponent<MeshRenderer>(); // ダミーのMeshRendererを追加
+            go.SetActive(false);
           }
           break;
         default:
@@ -133,12 +137,12 @@ public class UsdDummyView : NetworkBehaviour
     return go.GetComponent<MeshRenderer>();
   }
 
-  GameObject CreateFromMesh(Mesh mesh)
+  GameObject CreateFromMesh(int kind)
   {
-    var go = new GameObject("MeshVisual");
+    var go = new GameObject("Visual_" + kind.ToString());
     var mf = go.AddComponent<MeshFilter>();
     var mr = go.AddComponent<MeshRenderer>();
-    mf.sharedMesh = mesh;
+    mf.sharedMesh = meshTable[kind - 10];
     return go;
   }
 

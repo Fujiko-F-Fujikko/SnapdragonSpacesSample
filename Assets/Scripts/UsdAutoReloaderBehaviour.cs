@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using Unity.Formats.USD;
+using Unity.Netcode;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -81,7 +82,17 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
 
   public void TryReload()
   {
-    if (!usdAsset) return;
+    if (!NetworkManager.Singleton.IsServer)
+    {
+      Debug.LogWarning("[USD] TryReload called on non-server instance. Ignored.", this);
+      return;
+    }
+    if (!usdAsset)
+    {
+      Debug.LogWarning("[USD] UsdAsset is missing. Ignored.", this);
+      return;
+    }
+
     try
     {
       usdAsset.Reload(true);   // その場更新

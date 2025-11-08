@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 177352614}
   m_Layer: 0
   m_Name: DesktopCamera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -154,7 +154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc345594d52c200418f0b4c2a541023c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  positionOffset: {x: 0, y: 0.75, z: 0}
+  positionOffset: {x: 0, y: 0, z: 0}
   rotationOffsetEuler: {x: 0, y: 0, z: 0}
 --- !u!81 &177352615
 AudioListener:
@@ -824,7 +824,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1b87ccecb52e12418785a62f514e58d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverIp: 192.168.123.218
+  serverIp: 192.168.68.71
   port: 7777
   autoReconnect: 1
   retryIntervalSeconds: 3

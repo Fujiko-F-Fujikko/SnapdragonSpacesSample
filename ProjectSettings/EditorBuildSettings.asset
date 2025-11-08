@@ -16,13 +16,13 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Samples/Scenes/ServerScene.unity
     guid: 26417edc2e26e624ea2f269d402d55cf
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ServerScene_HMD.unity
     guid: 4b1475a0eee09d84cbb180b85da8af20
   - enabled: 0
     path: Assets/Samples/Scenes/ClientScene.unity
     guid: 4b7046c8b75eb664a88cdf05227febca
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/ClientScene_HMD.unity
     guid: dc26dd86294b1654bbc3e0f5e91543cb
   m_configObjects:

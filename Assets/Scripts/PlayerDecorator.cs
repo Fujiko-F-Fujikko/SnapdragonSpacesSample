@@ -101,7 +101,7 @@ public class PlayerDecorator : NetworkBehaviour
       var fb = GameObject.CreatePrimitive(PrimitiveType.Capsule);
       fb.name = "Body";
       fb.transform.SetParent(transform, false);
-      fb.transform.localPosition = new Vector3(0, 0, 0);
+      fb.transform.localPosition = new Vector3(0, -0.75f, 0);
       fb.transform.localScale = new Vector3(1f, 1f, 1f);
       fb.transform.localRotation = Quaternion.Euler(0, 0, 0);
       _body = fb.GetComponent<Renderer>();
