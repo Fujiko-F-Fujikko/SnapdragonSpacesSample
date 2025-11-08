@@ -1,6 +1,5 @@
 using Unity.Netcode; // Netcode for GameObjects
 using UnityEngine;
-using UnityEngine.XR;
 
 
 public class DesktopCamera : MonoBehaviour
@@ -14,15 +13,6 @@ public class DesktopCamera : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
-    // XRモード時は非表示、Desktopモード時は表示
-    if (XRSettings.enabled)
-    {
-      gameObject.SetActive(false);
-    }
-    else
-    {
-      gameObject.SetActive(true);
-    }
   }
 
   // Update is called once per frame

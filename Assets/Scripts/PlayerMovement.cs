@@ -69,7 +69,6 @@ public class PlayerMovement : NetworkBehaviour
     }
   }
 
-  // Update はデスクトップのみ
   void Update()
   {
     if (!IsOwner) return;
@@ -79,16 +78,6 @@ public class PlayerMovement : NetworkBehaviour
     else
       UpdateDesktop();
   }
-
-  /*
-    // XR 追従は LateUpdate で1回
-    void LateUpdate()
-    {
-      Debug.Log("[PlayerMovement] LateUpdate called. IsOwner: " + IsOwner + ", XRActive: " + XRActive);
-      if (!IsOwner) return;
-      if (XRActive) UpdateXR_ByXROrigin();
-    }
-    */
 
   // ローカル回転版（親空間での前方向の水平成分）
   Quaternion YawOnlyLocal(Quaternion localQ)
