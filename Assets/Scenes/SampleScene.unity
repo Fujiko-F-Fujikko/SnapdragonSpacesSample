@@ -829,7 +829,7 @@ GameObject:
   - component: {fileID: 782628377}
   - component: {fileID: 782628376}
   m_Layer: 0
-  m_Name: EnablePassthroughRobust
+  m_Name: AutoEnablePassthrough
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -847,7 +847,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65166cfb30999ad45953a7849bcdda44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifecycle: {fileID: 1459782275}
+  lifecycle: {fileID: 0}
   retryInterval: 0.1
   retryTimeout: 5
 --- !u!4 &782628377
