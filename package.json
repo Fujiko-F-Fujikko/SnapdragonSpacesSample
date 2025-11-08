@@ -11,7 +11,8 @@
   "dependencies": {
     "com.unity.netcode.gameobjects": "1.7.1",
     "com.unity.transport": "1.4.1",
-    "com.unity.formats.usd": "3.0.0-exp.5"
+    "com.unity.formats.usd": "3.0.0-exp.5",
+    "com.qualcomm.snapdragon.spaces": "1.0.3"
   },
   "samples": []
 }
