@@ -89,22 +89,22 @@ public class PlayerMovement : NetworkBehaviour
 
   void UpdateXR_ByXROrigin()
   {
-    Debug.Log("[PlayerMovement] UpdateXR_ByXROrigin called.");
-    Debug.Log($"  _rig: {_rig.name}, _hmdCam: {_hmdCam.name}");
+    //Debug.Log("[PlayerMovement] UpdateXR_ByXROrigin called.");
+    //Debug.Log($"  _rig: {_rig.name}, _hmdCam: {_hmdCam.name}");
     if (_rig == null || _hmdCam == null) return;
 
     // 1) 今フレームのHMDワールド姿勢
     var headWorldPos = _hmdCam.transform.position;
     var headWorldRot = _hmdCam.transform.rotation;
-    Debug.Log($"  Head World Pos: {headWorldPos}, Head World Rot: {headWorldRot}");
+    //Debug.Log($"  Head World Pos: {headWorldPos}, Head World Rot: {headWorldRot}");
 
 
     var headLocalYaw = YawOnlyLocal(_hmdCam.transform.localRotation);
-    Debug.Log($"  HeadLocalYaw: {headLocalYaw.eulerAngles}");
+    //Debug.Log($"  HeadLocalYaw: {headLocalYaw.eulerAngles}");
 
     // 3) 現在のリグ空間でのカメラ位置（Camera Offsetの変化を含む）
     var camLocalInOrigin = _xr.CameraInOriginSpacePos;
-    Debug.Log($"  CamLocalInOrigin: {camLocalInOrigin}");
+    //Debug.Log($"  CamLocalInOrigin: {camLocalInOrigin}");
 
     _rig.transform.position = camLocalInOrigin;
     _rig.transform.rotation = headLocalYaw;
