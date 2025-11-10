@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Samples/Scenes/ClientScene_HMD.unity
     guid: 9a1f2d94322ca814a9a29f440082afbe
+  - enabled: 0
+    path: Assets/Samples/Scenes/ServerScene_Cube.unity
+    guid: 5bb9153a3d3f3c04b86ff931b1763479
   m_configObjects:
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 972fba93a048d5a498ddf55a66afd2c2, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: a76e12822618cf3488aafb98d803a561, type: 2}
