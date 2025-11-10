@@ -89,7 +89,12 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
     }
     if (!usdAsset)
     {
-      Debug.LogWarning("[UsdAutoReloaderBehaviour] UsdAsset is missing. Ignored.", this);
+      Debug.LogWarning("[UsdAutoReloaderBehaviour] usdAsset is not set, trying to get component.", this);
+      usdAsset = GetComponent<UsdAsset>();
+    }
+    if (!usdAsset)
+    {
+      Debug.LogWarning("[UsdAutoReloaderBehaviour] UsdAsset not found. Ignored.", this);
       return;
     }
 
