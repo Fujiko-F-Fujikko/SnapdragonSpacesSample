@@ -34,20 +34,20 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
     if (!usdAsset) usdAsset = GetComponent<UsdAsset>();
     if (!usdAsset)
     {
-      Debug.LogWarning("[USD] UsdAsset が見つかりません。", this);
+      Debug.LogWarning("[UsdAutoReloaderBehaviour] UsdAsset が見つかりません。", this);
       enabled = false; return;
     }
 
     _path = usdAsset.usdFullPath;
     if (string.IsNullOrEmpty(_path) || !File.Exists(_path))
     {
-      Debug.LogWarning($"[USD] 監視対象ファイルが無効です: {_path}", this);
+      Debug.LogWarning($"[UsdAutoReloaderBehaviour] 監視対象ファイルが無効です: {_path}", this);
       enabled = false; return;
     }
     _path = Path.GetFullPath(_path);
     _lastWriteUtc = File.GetLastWriteTimeUtc(_path);
     _nextPollAt = Time.unscaledTime + pollInterval;
-    if (verboseLog) Debug.Log($"[USD] Watching: {_path}", this);
+    if (verboseLog) Debug.Log($"[UsdAutoReloaderBehaviour] Watching: {_path}", this);
   }
 
   void Update()
@@ -64,12 +64,12 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
         {
           _lastWriteUtc = wt;
           _scheduledAt = now + debounceSeconds;  // デバウンス
-          if (verboseLog) Debug.Log("[USD] Change detected, scheduled reload.", this);
+          if (verboseLog) Debug.Log("[UsdAutoReloaderBehaviour] Change detected, scheduled reload.", this);
         }
       }
       catch (Exception e)
       {
-        if (verboseLog) Debug.LogWarning($"[USD] Watch error: {e.Message}", this);
+        if (verboseLog) Debug.LogWarning($"[UsdAutoReloaderBehaviour] Watch error: {e.Message}", this);
       }
     }
 
@@ -84,19 +84,19 @@ public class UsdAutoReloaderBehaviour : MonoBehaviour
   {
     if (!NetworkManager.Singleton.IsServer)
     {
-      Debug.LogWarning("[USD] TryReload called on non-server instance. Ignored.", this);
+      Debug.LogWarning("[UsdAutoReloaderBehaviour] TryReload called on non-server instance. Ignored.", this);
       return;
     }
     if (!usdAsset)
     {
-      Debug.LogWarning("[USD] UsdAsset is missing. Ignored.", this);
+      Debug.LogWarning("[UsdAutoReloaderBehaviour] UsdAsset is missing. Ignored.", this);
       return;
     }
 
     try
     {
       usdAsset.Reload(true);   // その場更新
-      if (verboseLog) Debug.Log("[USD] Reload(true) executed.", this);
+      if (verboseLog) Debug.Log("[UsdAutoReloaderBehaviour] Reload(true) executed.", this);
       OnUsdReloaded?.Invoke(usdAsset);
     }
     catch (Exception ex)
@@ -111,6 +111,6 @@ using UnityEngine;
 public class UsdAutoReloaderBehaviour : MonoBehaviour
 {
   [SerializeField] private bool logOnce = true;
-  void Awake() { if (logOnce) Debug.Log("[USD] UsdAutoReloaderBehaviour disabled (HAS_UNITY_USD not defined).", this); }
+  void Awake() { if (logOnce) Debug.Log("[UsdAutoReloaderBehaviour] UsdAutoReloaderBehaviour disabled (HAS_UNITY_USD not defined).", this); }
 }
 #endif

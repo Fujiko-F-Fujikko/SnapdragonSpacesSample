@@ -2526,10 +2526,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: AutoClientBootstrap
       objectReference: {fileID: 0}
-    - target: {fileID: 3689226701525975668, guid: 8e8649c807c4dbc49a7ce185479e71de, type: 3}
-      propertyPath: serverIp
-      value: 192.168.68.71
-      objectReference: {fileID: 0}
     - target: {fileID: 8889878575345829761, guid: 8e8649c807c4dbc49a7ce185479e71de, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

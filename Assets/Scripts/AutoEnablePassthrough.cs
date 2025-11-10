@@ -26,7 +26,7 @@ public class AutoEnablePassthrough : MonoBehaviour
 
   void OnOpenXRStarted()
   {
-    Debug.Log("[PT] OpenXR started. Will enable passthrough when ready...");
+    Debug.Log("[AutoEnablePassthrough] OpenXR started. Will enable passthrough when ready...");
     _feature = OpenXRSettings.Instance?.GetFeature<BaseRuntimeFeature>();
     if (_routine != null) StopCoroutine(_routine);
     _routine = StartCoroutine(EnableWhenReady());
@@ -37,7 +37,7 @@ public class AutoEnablePassthrough : MonoBehaviour
     float t = 0f;
     while (t < retryTimeout)
     {
-      Debug.Log("[PT] Enable passthrough trial [" + t + "]sec...");
+      Debug.Log("[AutoEnablePassthrough] Enable passthrough trial [" + t + "]sec...");
 
       // 1) Feature が使える状態か（OpenXR/Runtimeの準備OK？）
       bool usable = (_feature != null) && FeatureUseCheckUtility.IsFeatureUseable(_feature);
@@ -48,7 +48,7 @@ public class AutoEnablePassthrough : MonoBehaviour
       // 3) すでにONなら終了
       if (supported && _feature.GetPassthroughEnabled())
       {
-        Debug.Log("[PT] Already enabled.");
+        Debug.Log("[AutoEnablePassthrough] Already enabled.");
         yield break;
       }
 
@@ -59,7 +59,7 @@ public class AutoEnablePassthrough : MonoBehaviour
         yield return null;
         if (_feature.GetPassthroughEnabled())
         {
-          Debug.Log("[PT] Enabled once runtime became ready.");
+          Debug.Log("[AutoEnablePassthrough] Enabled once runtime became ready.");
           yield break;
         }
       }
@@ -67,7 +67,7 @@ public class AutoEnablePassthrough : MonoBehaviour
       yield return new WaitForSeconds(retryInterval);
       t += retryInterval;
     }
-    Debug.LogWarning("[PT] Timed out waiting for passthrough readiness.");
+    Debug.LogWarning("[AutoEnablePassthrough] Timed out waiting for passthrough readiness.");
   }
 }
 #else

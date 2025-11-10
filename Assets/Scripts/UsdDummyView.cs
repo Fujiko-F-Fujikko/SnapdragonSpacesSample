@@ -26,7 +26,7 @@ public class UsdDummyView : NetworkBehaviour
 
   public override void OnNetworkSpawn()
   {
-    Debug.Log($"[USD-Dummy] UsdDummyView spawned: {usdPath.Value}", this);
+    Debug.Log($"[UsdDummyView] UsdDummyView spawned: {usdPath.Value}", this);
 
     // Transform
     ApplyTransform(worldPos.Value, worldRot.Value, worldScale.Value);
@@ -63,7 +63,7 @@ public class UsdDummyView : NetworkBehaviour
 
   void OnVisualKindChanged(byte prev, byte now)
   {
-    Debug.Log($"[USD-Dummy] VisualKind changed: {prev} -> {now}", this);
+    Debug.Log($"[UsdDummyView] VisualKind changed: {prev} -> {now}", this);
 
     // 見た目を作り直す
     _renderer = EnsureVisual(now, usdPath.Value.ToString());
@@ -113,7 +113,7 @@ public class UsdDummyView : NetworkBehaviour
           go.AddComponent<MeshRenderer>(); // ダミーのMeshRendererを追加
           // Clientでは無効にする. Hostでは有効にする
           // (Clientで作成するとCameraが取られてしまうので)
-          Debug.Log($"[USD-Dummy] Creating Camera. IsHost: {IsHost}, IsClient: {IsClient}, IsServer: {IsServer}", this);
+          Debug.Log($"[UsdDummyView] Creating Camera. IsHost: {IsHost}, IsClient: {IsClient}, IsServer: {IsServer}", this);
           if (IsClient)
           {
             go.SetActive(false);

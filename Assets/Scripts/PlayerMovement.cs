@@ -94,8 +94,8 @@ public class PlayerMovement : NetworkBehaviour
     if (_rig == null || _hmdCam == null) return;
 
     // 1) 今フレームのHMDワールド姿勢
-    var headWorldPos = _hmdCam.transform.position;
-    var headWorldRot = _hmdCam.transform.rotation;
+    //var headWorldPos = _hmdCam.transform.position;
+    //var headWorldRot = _hmdCam.transform.rotation;
     //Debug.Log($"  Head World Pos: {headWorldPos}, Head World Rot: {headWorldRot}");
 
 
