@@ -60,14 +60,19 @@ DefaultNetworkPrefabs.asset … NetworkManager 用プリセット参照
 
 #### [Client Scene]
 4. `Packages/WIARS: NGO Sync/Samples/Scenes/ClientScene.unity` を開く。
-5. **[SnapdragonSpaces]** HMDで起動する場合は、**シーン直下に**SnapdragonSpacesで必要なGameObjectを配置してください。
-   - ![image](/.resources/screenshot_00.png)
+5. **[SnapdragonSpaces]** HMDで起動する場合は、
+   1. `DesktopCamera`を削除して、代わりに、**シーン直下に**SnapdragonSpacesで必要なGameObjectを配置してください。
+      - ** Spaces Host ViewはDisable**にしてください。
+      - ** Left/Right Controller** はそのままでも動きますが、logcatに大量にnullログが出てしまうので、可能であればDisableにしてください。
+        - ![image](/.resources/screenshot_00.png)
+   2. `Packages/WIARS: NGO Sync/Runtime/NGOSync > Assembly Definition References`に`Snapdragon.Spaces.Runtime`を追加してください。
+      - ![image](/.resources/screenshot_07.png) 
 6. `AutoClientBootstrap > Auto Client Bootstrap > Server Endpoint > Server Ip`にServerシーンが動いているデバイスのIPアドレスを入力
    - **[!重要!]** 事前にServerシーンを動かすデバイスにおいて、**UDP, port=7777**の通信を許可する設定をしておくこと！（ファイアウォールなどを開けておく）
 7. 別途Serverシーンを起動させておく
    - Editorの多重起動はできないので、ServerSceneをWindowsビルドし、exeから起動するのが良いです。
 8.  PIEでPlay開始
-9. Serverと同じコンテンツが見えればOK
+9.  Serverと同じコンテンツが見えればOK
     - Clientの場合、Game画面にはPlayer視点の映像が出力されます。
       - Windows上で起動した場合、WASD＋マウスでPlayerの操作ができます。
       - ![image](/.resources/screenshot_06.png)
@@ -98,15 +103,17 @@ DefaultNetworkPrefabs.asset … NetworkManager 用プリセット参照
 
 ## 🧩 Prefab詳細
 
-| プレハブ名                         | 主構成コンポーネント (抜粋)                                                                                      | 目的 / 機能概要                                                                                      | 主なカスタム設定項目                                                                                           |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `NetworkManager`                   | `NetworkManager`, `UnityTransport`                                                                               | NGO のホスト/サーバ/クライアント開始と接続管理                                                       | Transport の Port / ConnData / NetworkPrefabs 設定                                                             |
-| `NGOControlHud`                    | `NGOHud`                                                                                                         | 実行中の IP/Port 編集・ Host/Client/Server 起動・ Shutdown・最近イベント表示                         | IP / Port (HUD 内で編集可能)                                                                                   |
-| `AutoClientBootstrap`              | `AutoClientBootstrap`                                                                                            | 起動後指定 IP/Port へ即時 Client 接続 + 再接続リトライ + 簡易ステータス表示                          | `serverIp` / `port` / `autoReconnect` / `retryIntervalSeconds` / `showHud`                                     |
-| `Player`                           | `NetworkObject`, `PlayerRole`, `PlayerDecorator`, `PlayerMovement`, `ClientAuthTransform`, `CharacterController` | 各クライアント/Host のプレイヤー表示・役割彩色・移動操作 (VR/非VR両対応)・Transform クライアント権限 | `PlayerMovement` 各種速度/感度, `PlayerDecorator` 色設定, `ClientAuthTransform` 権限 (内部固定)                |
-| `NGOSpawner`                       | `NGOSpawner` (Serverのみ動作)                                                                                    | Server 起動時に複数 NetworkObject を一括 Spawn。USD連動オブジェクトは初期リロード                    | `spawnEntries` (Prefab / Position / Rotation / Scale)                                                          |
-| `DummyObject`                      | `NetworkObject`, `UsdDummyView` (+ `NetworkTransform` 推奨)                                                      | USD 階層ノードをネットワーク表示へ差し替えるダミー表示ベース                                         | `UsdDummyView > meshTable` (カスタムMesh順番)                                                                  |
-| `SampleCube_prefab_net` (サンプル) | `UsdAsset`, `NetworkObject`, `NetworkTransform`, `UsdAutoReloaderBehaviour`, `UsdReloadNetworkSpawner`           | USD ファイル監視→リロード→階層走査→ダミー生成（Server側）                                            | `UsdAutoReloaderBehaviour` poll/debounce, `UsdReloadNetworkSpawner` keywordList / dummyPrefab / networkizeRoot |
+| プレハブ名                         | 主構成コンポーネント (抜粋)                                                                                      | 目的 / 機能概要                                                                                                              | 主なカスタム設定項目                                                                                           |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `NetworkManager`                   | `NetworkManager`, `UnityTransport`                                                                               | NGO のホスト/サーバ/クライアント開始と接続管理                                                                               | Transport の Port / ConnData / NetworkPrefabs 設定                                                             |
+| `NGOControlHud`                    | `NGOHud`                                                                                                         | 実行中の IP/Port 編集・ Host/Client/Server 起動・ Shutdown・最近イベント表示                                                 | IP / Port (HUD 内で編集可能)                                                                                   |
+| `AutoClientBootstrap`              | `AutoClientBootstrap`                                                                                            | 起動後指定 IP/Port へ即時 Client 接続 + 再接続リトライ + 簡易ステータス表示                                                  | `serverIp` / `port` / `autoReconnect` / `retryIntervalSeconds` / `showHud`                                     |
+| `Player`                           | `NetworkObject`, `PlayerRole`, `PlayerDecorator`, `PlayerMovement`, `ClientAuthTransform`, `CharacterController` | 各クライアント/Host のプレイヤー表示・役割彩色・移動操作 (VR/非VR両対応)・Transform クライアント権限                         | `PlayerMovement` 各種速度/感度, `PlayerDecorator` 色設定, `ClientAuthTransform` 権限 (内部固定)                |
+| `DesktopCamera`                    | `DesktopCamera`, `Camera`                                                                                        | デスクトップ(非XR)用のローカルプレイヤー追従カメラ。接続後 Local Player を探索し位置/回転オフセット適用。XR(HMD)利用時は削除 | `positionOffset` (ローカル座標オフセット) / `rotationOffsetEuler` (追加回転)                                   |
+| `NGOSpawner`                       | `NGOSpawner` (Serverのみ動作)                                                                                    | Server 起動時に複数 NetworkObject を一括 Spawn。USD連動オブジェクトは初期リロード                                            | `spawnEntries` (Prefab / Position / Rotation / Scale)                                                          |
+| `DummyObject`                      | `NetworkObject`, `UsdDummyView` (+ `NetworkTransform` 推奨)                                                      | USD 階層ノードをネットワーク表示へ差し替えるダミー表示ベース                                                                 | `UsdDummyView > meshTable` (カスタムMesh順番)                                                                  |
+| `SampleCube_prefab_net` (サンプル) | `UsdAsset`, `NetworkObject`, `NetworkTransform`, `UsdAutoReloaderBehaviour`, `UsdReloadNetworkSpawner`           | USD ファイル監視→リロード→階層走査→ダミー生成（Server側）                                                                    | `UsdAutoReloaderBehaviour` poll/debounce, `UsdReloadNetworkSpawner` keywordList / dummyPrefab / networkizeRoot |
+
 
 ### 補足
 - `HAS_UNITY_USD` を定義しないビルドでは `NGOSpawner` / `UsdAutoReloaderBehaviour` / `UsdReloadNetworkSpawner` / `UsdDummyView` はダミー/無効化ログのみになり、USD 関連プレハブは機能しません。
